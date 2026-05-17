@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest *)",
+      "Bash(New-Item -ItemType Directory -Path \"app\\\\api\\\\weather\" -Force)",
+      "Bash(Out-Null)"
+    ]
+  }
+}
