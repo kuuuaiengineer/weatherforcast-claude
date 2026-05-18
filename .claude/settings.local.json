@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npx create-next-app@latest *)",
       "Bash(New-Item -ItemType Directory -Path \"app\\\\api\\\\weather\" -Force)",
-      "Bash(Out-Null)"
+      "Bash(Out-Null)",
+      "Bash(npm run *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
     ]
   }
 }

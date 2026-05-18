@@ -36,17 +36,28 @@ export async function GET(req: NextRequest) {
 
   const data = await res.json();
 
-  // Group by date (YYYY-MM-DD)
-  const byDate: Record<string, { temps: number[]; pop: number[]; humidity: number[]; icons: string[]; descs: string[] }> = {};
+  type Slot = { time: string; temp: number; pop: number; icon: string; description: string };
+  const byDate: Record<string, {
+    temps: number[]; pop: number[]; humidity: number[]; icons: string[]; descs: string[];
+    slots: Slot[];
+  }> = {};
 
   for (const item of data.list) {
     const date = item.dt_txt.slice(0, 10);
-    if (!byDate[date]) byDate[date] = { temps: [], pop: [], humidity: [], icons: [], descs: [] };
+    const time = item.dt_txt.slice(11, 16);
+    if (!byDate[date]) byDate[date] = { temps: [], pop: [], humidity: [], icons: [], descs: [], slots: [] };
     byDate[date].temps.push(item.main.temp);
     byDate[date].pop.push(item.pop ?? 0);
     byDate[date].humidity.push(item.main.humidity);
     byDate[date].icons.push(item.weather[0].icon);
     byDate[date].descs.push(item.weather[0].description);
+    byDate[date].slots.push({
+      time,
+      temp: Math.round(item.main.temp),
+      pop: Math.round((item.pop ?? 0) * 100),
+      icon: item.weather[0].icon,
+      description: item.weather[0].description,
+    });
   }
 
   const forecast = Object.entries(byDate).map(([date, d]) => ({
@@ -57,6 +68,7 @@ export async function GET(req: NextRequest) {
     pop: Math.round(Math.max(...d.pop) * 100),
     icon: d.icons[Math.floor(d.icons.length / 2)],
     description: d.descs[Math.floor(d.descs.length / 2)],
+    slots: d.slots,
   }));
 
   return NextResponse.json({
