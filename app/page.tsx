@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import NotifySettings from "./components/NotifySettings";
 
 type Slot = {
   time: string;
@@ -232,6 +233,8 @@ export default function Home() {
           )}
         </div>
       )}
+
+      <NotifySettings currentCity={data?.city} />
     </main>
   );
 }
