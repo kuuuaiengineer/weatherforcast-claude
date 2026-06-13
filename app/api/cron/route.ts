@@ -16,7 +16,9 @@ export async function GET(req: NextRequest) {
   if (keys.length === 0) return NextResponse.json({ sent: 0 });
 
   const apiKey = process.env.OPENWEATHER_API_KEY!;
-  const today = new Date().toISOString().slice(0, 10);
+  // JSTで「今日」を取得
+  const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const today = nowJST.toISOString().slice(0, 10);
   let sent = 0;
 
   for (const key of keys) {
@@ -31,9 +33,11 @@ export async function GET(req: NextRequest) {
       if (!res.ok) continue;
       const data = await res.json();
 
-      const slots = data.list.filter((item: { dt_txt: string }) => {
-        const date = item.dt_txt.slice(0, 10);
-        const hour = parseInt(item.dt_txt.slice(11, 13));
+      const slots = data.list.filter((item: { dt: number }) => {
+        // UTC timestamp → JST に変換して日付・時刻を判定
+        const jst = new Date(item.dt * 1000 + 9 * 60 * 60 * 1000);
+        const date = jst.toISOString().slice(0, 10);
+        const hour = jst.getUTCHours();
         return date === today && hour >= cityConfig.timeFrom && hour <= cityConfig.timeTo;
       });
 
