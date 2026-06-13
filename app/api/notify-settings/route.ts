@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@vercel/kv";
 
-export type NotifyConfig = {
-  email: string;
+export type CityConfig = {
   city: string;
   timeFrom: number;
   timeTo: number;
   threshold: number;
+};
+
+export type NotifyConfig = {
+  email: string;
+  cities: CityConfig[];
 };
 
 export async function GET(req: NextRequest) {
@@ -18,8 +22,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body: NotifyConfig = await req.json();
-  if (!body.email || !body.city) {
-    return NextResponse.json({ error: "email and city required" }, { status: 400 });
+  if (!body.email || !body.cities?.length) {
+    return NextResponse.json({ error: "email and cities required" }, { status: 400 });
   }
   await kv.set(`notify:${body.email}`, body);
   return NextResponse.json({ ok: true });
